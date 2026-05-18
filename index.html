@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Engineering Masterbook - Part 1</title>
+    <!-- Google Fonts for Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&family=Fira+Code:wght@400;600&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Mermaid.js for Diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            mermaid.initialize({ startOnLoad: true, theme: 'default' });
+        });
+    </script>
+    <style>
+        :root {
+            --primary-color: #1a365d;
+            --secondary-color: #2b6cb0;
+            --accent-color: #ed8936;
+            --bg-color: #f7fafc;
+            --text-color: #2d3748;
+            --code-bg: #1e1e1e;
+            --code-text: #d4d4d4;
+            --paper-white: #ffffff;
+            --border-color: #e2e8f0;
+            --note-bg: #ebf8ff;
+            --warning-bg: #fffaf0;
+            --tip-bg: #f0fff4;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Merriweather', serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .sidebar h3 {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar ul {
+            list-style: none;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 10px;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .sidebar ul li a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Main Content A4 Pages */
+        .book-container {
+            margin-left: 250px;
+            width: 100%;
+            max-width: 900px;
+            padding: 40px;
+        }
+
+        .page {
+            background-color: var(--paper-white);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            padding: 60px 80px;
+            margin-bottom: 40px;
+            border-radius: 4px;
+            min-height: 297mm; /* Approximate A4 */
+            position: relative;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--primary-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--secondary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+            color: #4a5568;
+        }
+
+        strong {
+            color: var(--primary-color);
+        }
+
+        ul, ol {
+            margin-bottom: 1.5rem;
+            padding-left: 2rem;
+            color: #4a5568;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Callout Boxes */
+        .callout {
+            padding: 15px 20px;
+            border-left: 5px solid;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+            font-size: 0.95rem;
+        }
+
+        .callout-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .note {
+            background-color: var(--note-bg);
+            border-color: #3182ce;
+        }
+        .note .callout-title { color: #3182ce; }
+
+        .warning {
+            background-color: var(--warning-bg);
+            border-color: #dd6b20;
+        }
+        .warning .callout-title { color: #dd6b20; }
+
+        .tip {
+            background-color: var(--tip-bg);
+            border-color: #38a169;
+        }
+        .tip .callout-title { color: #38a169; }
+
+        .interview {
+            background-color: #faf5ff;
+            border-color: #805ad5;
+        }
+        .interview .callout-title { color: #805ad5; }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 20px 0;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: #edf2f7;
+            color: #c53030;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Comment style in code */
+        .c { color: #6a9955; font-style: italic; }
+        .k { color: #569cd6; font-weight: bold; }
+        .s { color: #ce9178; }
+        .f { color: #dcdcaa; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.95rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        /* Diagrams Container */
+        .diagram-container {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .diagram-caption {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        /* PDF Button */
+        .pdf-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1rem;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            transition: transform 0.2s, background-color 0.2s;
+            z-index: 1000;
+        }
+
+        .pdf-btn:hover {
+            transform: translateY(-2px);
+            background-color: #dd6b20;
+        }
+
+        /* Print CSS */
+        @media print {
+            body { background-color: white; }
+            .sidebar, .pdf-btn { display: none; }
+            .book-container { margin: 0; padding: 0; max-width: 100%; }
+            .page {
+                box-shadow: none;
+                margin: 0;
+                padding: 15mm;
+                page-break-after: always;
+            }
+            pre { page-break-inside: avoid; }
+            table { page-break-inside: avoid; }
+            .diagram-container { page-break-inside: avoid; }
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 8px 8px 0 0;
+            margin-top: -60px;
+            margin-left: -80px;
+            margin-right: -80px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            color: white;
+            border: none;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            color: #e2e8f0;
+            font-size: 1.2rem;
+            font-family: 'Montserrat', sans-serif;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar / TOC -->
+    <nav class="sidebar">
+        <h3>Masterbook</h3>
+        <ul>
+            <li><a href="#ch1">1. Programming Basics</a></li>
+            <li><a href="#ch2">2. Data Types</a></li>
+            <li><a href="#ch3">3. Control Flow</a></li>
+            <li><a href="#ch4">4. Functions</a></li>
+            <li><a href="#ch5">5. OOP Concepts</a></li>
+            <li><a href="#ch6">6. Error Handling</a></li>
+            <li><a href="#ch7">7. File Handling</a></li>
+            <li><a href="#ch8">8. DSA Fundamentals</a></li>
+            <li><a href="#ch9">9. APIs & Networking</a></li>
+            <li><a href="#ch10">10. Databases</a></li>
+            <li><a href="#ch11">11. Async Programming</a></li>
+            <li><a href="#ch12">12. Development Tools</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="book-container">
+
+        <!-- Title Page -->
+        <div class="page" id="title-page">
+            <div class="hero">
+                <h1>AI Agent Engineering</h1>
+                <p>Beginner-to-Production Masterbook</p>
+                <br>
+                <p style="font-size: 0.9rem; color: #cbd5e0;">Part 1 — Programming Foundations</p>
+            </div>
+            
+            <div class="callout note">
+                <div class="callout-title">Author's Note</div>
+                Yeh kitab ek premium "Hinglish" format mein design ki gayi hai. Hum technical concepts ko English terms ke saath Hindi conversational style mein samjhayenge. Iska maksad hai complex AI aur Software Engineering concepts ko ekdum simple aur intuitive banana.
+            </div>
+
+            <h2>How to use this book?</h2>
+            <p>Har chapter ko 18 structural pillars ke basis pe divide kiya gaya hai—Concepts se lekar Internal Working, Interview Questions, Code Examples, aur Diagrams tak. Is kitab ko padhne ke baad aap directly production-level code likhne ke kabil ban jayenge.</p>
+
+        </div>
+
+        <!-- CHAPTER 1 -->
+        <div class="page" id="ch1">
+            <h1>1. Programming Basics</h1>
+            
+            <h3>1. What is Programming?</h3>
+            <p>Programming ek bhasha (language) hai jiske through hum computers ko instructions dete hain. Computer apne aap kuch nahi sochta, use step-by-step logic dena padta hai. Is logic ko code mein likhne ki process ko programming kehte hain.</p>
+            
+            <h3>2. Why do we need it?</h3>
+            <p>Duniya ke saare tasks—chahe woh simple calculation ho ya advanced AI Agent ka decision-making—sab rules par aadharit hain. Manual kaam ko automate karne aur complex data ko process karne ke liye humein programming ki zaroorat hoti hai.</p>
+
+            <h3>3. Compiler vs Interpreter (Internal Working)</h3>
+            <p>Jab aap code likhte ho (High-Level Language jaise Python ya C++), computer use direct nahi samajhta. Us code ko 0s aur 1s (Machine Code) mein convert karna padta hai.</p>
+            
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TD
+                    A[Source Code] --> B{Translator}
+                    B -->|Reads entire file at once| C[Compiler]
+                    C --> D[Machine Code / .exe]
+                    D --> E[Execution]
+                    
+                    B -->|Reads line-by-line| F[Interpreter]
+                    F --> G[Translates & Executes on the fly]
+                    
+                    style A fill:#e2e8f0,stroke:#4a5568
+                    style C fill:#3182ce,color:white
+                    style F fill:#dd6b20,color:white
+                </div>
+                <div class="diagram-caption">Figure 1.1: Compiler vs Interpreter Execution Flow</div>
+            </div>
+
+            <table>
+                <tr>
+                    <th>Feature</th>
+                    <th>Compiler (e.g., C++, Java)</th>
+                    <th>Interpreter (e.g., Python, JS)</th>
+                </tr>
+                <tr>
+                    <td>Speed</td>
+                    <td>Fast at runtime, but takes time to compile beforehand.</td>
+                    <td>Slower at runtime because translation happens live.</td>
+                </tr>
+                <tr>
+                    <td>Error Detection</td>
+                    <td>Shows all errors at once after compiling.</td>
+                    <td>Stops at the first error it encounters line-by-line.</td>
+                </tr>
+            </table>
+
+            <h3>4. Variables, Constants & Comments</h3>
+            <p><strong>Variables:</strong> Variable ek container hota hai jo data store karta hai memory mein. Jaise agar aapko apna naam store karna hai, toh aap ek variable banaoge. <br>
+            <strong>Constants:</strong> Wo variables jinki value program run hone ke dauran change nahi hoti (e.g., <code>PI = 3.14</code>).<br>
+            <strong>Comments:</strong> Code ke andar wo text jo sirf developers ke padhne ke liye hota hai, interpreter use ignore kar deta hai.</p>
+
+            <div class="callout tip">
+                <div class="callout-title">Beginner Intuition</div>
+                Socho ki memory ek bada sa warehouse (godown) hai. Variable us warehouse ke andar rakha hua ek dabba (box) hai, jispe aapne ek label (name) laga diya hai. Dabe ke andar ka saaman (data) aap kabhi bhi badal sakte ho!
+            </div>
+
+            <h3>5. Input/Output & Operators</h3>
+            <p><strong>I/O:</strong> User se data lena (Input) aur result screen par dikhana (Output).<br>
+            <strong>Operators:</strong> Operators wo symbols hote hain jo variables par operations perform karte hain. Types of operators:</p>
+            <ul>
+                <li><strong>Arithmetic:</strong> <code>+, -, *, /, //, %</code> (Maths ke liye)</li>
+                <li><strong>Comparison:</strong> <code>==, !=, >, <</code> (Compare karne ke liye)</li>
+                <li><strong>Logical:</strong> <code>and, or, not</code> (Conditions combine karne ke liye)</li>
+                <li><strong>Assignment:</strong> <code>=, +=, -=</code> (Value assign karne ke liye)</li>
+            </ul>
+
+            <h3>6. Code Example: Basic Expressions & String Formatting</h3>
+<pre><code><span class="c"># Variables and Types</span>
+<span class="k">name</span> = <span class="s">"Agent-X"</span>  <span class="c"># String</span>
+<span class="k">version</span> = <span class="s">1.0</span>     <span class="c"># Float</span>
+<span class="k">is_active</span> = <span class="k">True</span>  <span class="c"># Boolean</span>
+
+<span class="c"># String Formatting (f-strings in Python)</span>
+<span class="k">print</span>(<span class="s">f"AI Name: {name}, Version: {version}"</span>)
+
+<span class="c"># Operators</span>
+<span class="k">a</span> = <span class="s">10</span>
+<span class="k">b</span> = <span class="s">3</span>
+<span class="k">print</span>(<span class="s">f"Addition: {a + b}"</span>)      <span class="c"># 13</span>
+<span class="k">print</span>(<span class="s">f"Floor Division: {a // b}"</span>) <span class="c"># 3 (Removes decimal)</span>
+<span class="k">print</span>(<span class="s">f"Modulo: {a % b}"</span>)        <span class="c"># 1 (Remainder)</span>
+</code></pre>
+
+            <div class="callout interview">
+                <div class="callout-title">Interview Question</div>
+                <strong>Q: Python mein type conversion kaise kaam karta hai? Implicit vs Explicit kya hai?</strong><br>
+                <em>Ans:</em> Jab Python khud datatype badal de (e.g., int + float = float), use <strong>Implicit</strong> kehte hain. Jab developer force kare (e.g., <code>int("10")</code>), use <strong>Explicit</strong> ya Typecasting kehte hain.
+            </div>
+
+            <div class="callout warning">
+                <div class="callout-title">Common Mistake</div>
+                Assignment operator <code>=</code> ko comparison operator <code>==</code> ke saath confuse karna. <code>x = 5</code> value assign karta hai, jabki <code>x == 5</code> check karta hai ki value 5 hai ya nahi.
+            </div>
+        </div>
+
+        <!-- CHAPTER 2 -->
+        <div class="page" id="ch2">
+            <h1>2. Data Types</h1>
+
+            <h3>1. What are Data Types?</h3>
+            <p>Aapke paas alag-alag tarah ka data hota hai—kuch text hota hai, kuch numbers. Programming language ko batana padta hai ki data kis category ka hai, taaki memory us hisaab se allocate ho sake.</p>
+
+            <h3>2. Internal Memory Model (Mutable vs Immutable)</h3>
+            <p>Python mein har cheez ek <strong>Object</strong> hoti hai. Datatypes ko do categories mein banta gaya hai:</p>
+            <ul>
+                <li><strong>Immutable (Jo badal nahi sakte):</strong> Integers, Floats, Strings, Tuples. Agar aap inki value change karte ho, toh pichli value update nahi hoti, balki memory mein ek naya object create ho jata hai.</li>
+                <li><strong>Mutable (Jo badal sakte hain):</strong> Lists, Dictionaries, Sets. Inhe memory mein usi location par modify kiya ja sakta hai.</li>
+            </ul>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph LR
+                    A[Data Types] --> B(Primitive)
+                    A --> C(Non-Primitive / Collections)
+                    
+                    B --> D[Integer: 42]
+                    B --> E[Float: 3.14]
+                    B --> F[Boolean: True/False]
+                    B --> G[String: 'Hello']
+                    
+                    C --> H[List: Mutable Array]
+                    C --> I[Tuple: Immutable Array]
+                    C --> J[Dictionary: Key-Value Map]
+                    C --> K[Set: Unique elements]
+                </div>
+                <div class="diagram-caption">Figure 2.1: Hierarchy of Data Types in Python</div>
+            </div>
+
+            <h3>3. Deep Dive into Collections</h3>
+            <p><strong>Lists:</strong> Ek ordered collection jo allow karti hai duplicate values aur modify ho sakti hai. Isko square brackets <code>[]</code> mein likhte hain.<br>
+            <strong>Tuple:</strong> List ki tarah hoti hai but immutable. Ek baar ban gayi toh change nahi ho sakti. Use brackets <code>()</code>.<br>
+            <strong>Dictionary:</strong> Key-Value pairs. Hash table data structure par based hai, isliye search bahut fast hota hai. Use curly braces <code>{}</code>.<br>
+            <strong>Set:</strong> Unordered collection of unique items. Duplicate values automatic remove ho jati hain.</p>
+
+            <h3>4. Code Example: Working with Collections</h3>
+<pre><code><span class="c"># List (Mutable)</span>
+<span class="k">ai_models</span> = [<span class="s">"GPT-4"</span>, <span class="s">"Gemini"</span>, <span class="s">"Claude"</span>]
+ai_models.append(<span class="s">"Llama-3"</span>)  <span class="c"># Modified in place</span>
+
+<span class="c"># Dictionary (Key-Value map)</span>
+<span class="k">agent_config</span> = {
+    <span class="s">"name"</span>: <span class="s">"ResearchBot"</span>,
+    <span class="s">"temperature"</span>: <span class="s">0.7</span>,
+    <span class="s">"tools"</span>: [<span class="s">"web_search"</span>, <span class="s">"calculator"</span>]
+}
+<span class="k">print</span>(agent_config[<span class="s">"tools"</span>])
+
+<span class="c"># Set (Removes duplicates)</span>
+<span class="k">tokens</span> = {<span class="s">"hello"</span>, <span class="s">"world"</span>, <span class="s">"hello"</span>}
+<span class="k">print</span>(tokens) <span class="c"># Output: {'hello', 'world'}</span>
+</code></pre>
+
+            <div class="callout tip">
+                <div class="callout-title">Industry Use Case</div>
+                Jab hum AI model ki settings (parameters) pass karte hain API mein, toh hamesha <strong>Dictionaries (JSON objects)</strong> ka use hota hai. Agar humein large database se unique words nikalne hain (tokenization ke time), toh hum <strong>Sets</strong> ka use karte hain taaki O(1) time complexity mile.
+            </div>
+            
+            <h3>5. Null / None Type</h3>
+            <p>Jab kisi variable ke paas koi value nahi hoti, toh usme garbage value avoid karne ke liye hum use explicitly <code>None</code> (Python) ya <code>null</code> (JS) assign karte hain. Yeh AI agents mein bahut use hota hai check karne ke liye ki kya agent ko tool_output mila ya abhi <code>None</code> hai.</p>
+
+        </div>
+
+        <!-- CHAPTER 3 -->
+        <div class="page" id="ch3">
+            <h1>3. Control Flow</h1>
+
+            <h3>1. What is Control Flow?</h3>
+            <p>Default roop se code upar se neeche (top-to-bottom) execute hota hai. Control flow statements is execution direction ko modne (branching) ya repeat karne (looping) ke kaam aate hain. <code>if/else</code> statements and loops programming ki decision-making brain hain.</p>
+
+            <h3>2. Conditional Statements (if, elif, else)</h3>
+            <p>Agar koi condition <code>True</code> hai tabhi code block chalega. Nested conditions ka matlab ek <code>if</code> ke andar doosra <code>if</code>.</p>
+
+            <h3>3. Loops (for, while) & Loop Control</h3>
+            <p><strong>For Loop:</strong> Jab humein pata hota hai kitni baar loop chalana hai ya jab hum kisi list/iterable ko traverse karte hain.<br>
+            <strong>While Loop:</strong> Jab tak koi condition <code>True</code> rehti hai, loop chalta rahega. Infinite loops khatarnaak ho sakte hain.<br>
+            <strong>Break:</strong> Loop ko beech mein hi completely rokne ke liye.<br>
+            <strong>Continue:</strong> Current iteration ko skip karke next cycle par jane ke liye.<br>
+            <strong>Pass:</strong> Ek placeholder statement jo kuch nahi karti, bas syntax error rokne ke kaam aati hai.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TD
+                    Start([Start Loop]) --> Cond{Condition True?}
+                    Cond -- Yes --> Exec[Execute Block]
+                    Exec --> CheckBreak{Break statement?}
+                    CheckBreak -- Yes --> End([Exit Loop])
+                    CheckBreak -- No --> CheckCont{Continue statement?}
+                    CheckCont -- Yes --> Cond
+                    CheckCont -- No --> NextIter[Next Iteration Setup]
+                    NextIter --> Cond
+                    Cond -- No --> End
+                </div>
+                <div class="diagram-caption">Figure 3.1: Loop Internal Mechanism (Break/Continue)</div>
+            </div>
+
+            <h3>4. Iterators & Generators (Advanced but Crucial)</h3>
+            <p><strong>Iterator:</strong> Aisa object jiske andar state maintain hoti hai, aur <code>next()</code> function call karne pe agli value aati hai.<br>
+            <strong>Generator:</strong> Yeh ek special function hai jo <code>return</code> ki jagah <code>yield</code> use karta hai. Iska sabse bada fayda ye hai ki ye ek sath saari memory consume nahi karta, values "on-the-fly" generate karta hai. (Lazy evaluation).</p>
+
+            <div class="callout tip">
+                <div class="callout-title">Industry Use Case for Generators</div>
+                Imagine aapko 100GB ki log file AI model me process karni hai. Agar normal list use ki toh RAM crash ho jayegi. Generators (<code>yield</code>) use karne se file line-by-line read hogi, using minimal memory. Streaming LLM outputs (jaise ChatGPT me text ek-ek word aata hai) generators ka hi kamal hai!
+            </div>
+
+            <h3>5. Code Example: Generators vs Standard Logic</h3>
+<pre><code><span class="c"># Normal List (Loads everything in memory)</span>
+<span class="k">def</span> <span class="f">get_numbers</span>(n):
+    result = []
+    <span class="k">for</span> i <span class="k">in</span> <span class="k">range</span>(n):
+        result.append(i)
+    <span class="k">return</span> result
+
+<span class="c"># Generator (Yields one item at a time - Memory Efficient)</span>
+<span class="k">def</span> <span class="f">generate_numbers</span>(n):
+    <span class="k">for</span> i <span class="k">in</span> <span class="k">range</span>(n):
+        <span class="k">yield</span> i
+
+<span class="c"># Using the generator</span>
+gen = generate_numbers(<span class="s">5</span>)
+<span class="k">print</span>(<span class="k">next</span>(gen)) <span class="c"># 0</span>
+<span class="k">print</span>(<span class="k">next</span>(gen)) <span class="c"># 1</span>
+<span class="c"># Pause execution. The function remembers its state!</span>
+</code></pre>
+        </div>
+
+        <!-- CHAPTER 4 -->
+        <div class="page" id="ch4">
+            <h1>4. Functions</h1>
+
+            <h3>1. What are Functions?</h3>
+            <p>Function block of reusable code hota hai. "Don't Repeat Yourself" (DRY) principle ko follow karne ke liye hum apne logic ko functions me wrap karte hain. Inhe parameters pass kiye jate hain, aur ye ek value <code>return</code> karte hain.</p>
+
+            <h3>2. Parameters, Default Arguments & Return</h3>
+            <p><strong>Parameters vs Arguments:</strong> Function definition ke time pe jo variables likhe jate hain wo Parameters hain. Call karte time jo values pass hoti hain wo Arguments hain.<br>
+            <strong>Default arguments:</strong> Agar function call karte time argument na bheja jaye, toh function default value use kar leta hai (e.g., <code>def greet(name="User"):</code>).</p>
+
+            <h3>3. Scope & Closures</h3>
+            <p><strong>Scope:</strong> Variable kahan tak accessible hai (Local vs Global). Local variable function ke andar zinda rehta hai aur bahar mar jata hai.<br>
+            <strong>Closure:</strong> Jab ek inner function apne outer function ke variables ko yaad rakhta hai, chahe outer function ka execution khatam hi kyun na ho gaya ho. Yeh state maintain karne ka functional tarika hai.</p>
+
+            <h3>4. Lambda Functions & Recursion</h3>
+            <p><strong>Lambda:</strong> One-line anonymous (bina naam ke) functions. Inhe wahan use karte hain jahan function ko as an argument pass karna ho (like `map()` ya `filter()`).<br>
+            <strong>Recursion:</strong> Jab function apne aap ko hi call karta hai. Base condition zaroori hai warna `RecursionError` (Stack Overflow) aayega.</p>
+
+            <h3>5. Decorators (Python Magic)</h3>
+            <p><strong>What is it?</strong> Decorator ek function hai jo dusre function ki functionality modify ya extend karta hai bina uska code change kiye. Yeh AI/Web development (FastAPI/Flask) me routing aur logging ke liye heavily use hota hai.</p>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph LR
+                    A[Original Function] --> B((Decorator Wrapper))
+                    B -->|Pre-processing| C[Execute Original Function]
+                    C -->|Post-processing| D[Return Result]
+                </div>
+                <div class="diagram-caption">Figure 4.1: How Decorators Wrap Functions</div>
+            </div>
+
+            <h3>6. Code Example: Building a Retry Decorator for APIs</h3>
+<pre><code><span class="k">import</span> time
+
+<span class="c"># A decorator to automatically retry an API call if it fails</span>
+<span class="k">def</span> <span class="f">retry_api_call</span>(retries=<span class="s">3</span>):
+    <span class="k">def</span> <span class="f">decorator</span>(func):
+        <span class="k">def</span> <span class="f">wrapper</span>(*args, **kwargs):
+            <span class="k">for</span> attempt <span class="k">in</span> <span class="k">range</span>(retries):
+                <span class="k">try</span>:
+                    <span class="c"># Try executing the actual function</span>
+                    <span class="k">return</span> func(*args, **kwargs)
+                <span class="k">except</span> <span class="k">Exception</span> <span class="k">as</span> e:
+                    <span class="k">print</span>(<span class="s">f"Attempt {attempt+1} failed: {e}. Retrying..."</span>)
+                    time.sleep(<span class="s">1</span>)
+            <span class="k">return</span> <span class="s">"All attempts failed."</span>
+        <span class="k">return</span> wrapper
+    <span class="k">return</span> decorator
+
+<span class="c"># Applying the decorator</span>
+<span class="k">@retry_api_call</span>(retries=<span class="s">2</span>)
+<span class="k">def</span> <span class="f">call_llm_api</span>():
+    <span class="c"># Simulating API failure</span>
+    <span class="k">raise</span> <span class="k">ValueError</span>(<span class="s">"Network Error or Rate Limit"</span>)
+
+<span class="c"># It will automatically try 2 times!</span>
+call_llm_api()
+</code></pre>
+
+            <div class="callout interview">
+                <div class="callout-title">Interview Question</div>
+                <strong>Q: *args and **kwargs kya hote hain?</strong><br>
+                <em>Ans:</em> Jab humein pata nahi hota ki function mein kitne arguments aayenge, tab hum inhe use karte hain. <code>*args</code> arguments ko Tuple ki tarah leta hai, aur <code>**kwargs</code> named arguments ko Dictionary ki tarah pass karta hai.
+            </div>
+
+        </div>
+
+        <!-- CHAPTER 5 -->
+        <div class="page" id="ch5">
+            <h1>5. Object-Oriented Programming (OOP)</h1>
+
+            <h3>1. What is OOP?</h3>
+            <p>Real-world entities (jaise Car, Bank Account, ya AI Agent) ko code mein as an "Object" model karne ke tarike ko OOP (Object-Oriented Programming) kehte hain. OOP code ko organized, modular, aur reusable banata hai.</p>
+
+            <h3>2. Classes & Objects</h3>
+            <p><strong>Class:</strong> Ek blueprint ya naksha. Jaise "Dog" ek class ho sakti hai.<br>
+            <strong>Object:</strong> Class ka real instantiation. Jaise "Tommy" ya "Sheru" us Dog class ke objects (instances) hain.</p>
+
+            <h3>3. The 4 Pillars of OOP</h3>
+            <ul>
+                <li><strong>Encapsulation:</strong> Data (variables) aur methods (functions) ko ek class ke andar bind karna aur bahar ki duniya se chupana (Private variables). Data ko protect karta hai.</li>
+                <li><strong>Abstraction:</strong> Sirf zaroori details show karna, complex internal implementation hide karna. Jaise car ka steering wheel (Interface) vs Engine (Internal).</li>
+                <li><strong>Inheritance:</strong> Ek class (Child) dusri class (Parent) ki properties ko inherit (le) sakti hai. Code reuse badhta hai.</li>
+                <li><strong>Polymorphism:</strong> (Poly = many, morph = forms). Ek hi function ka naam alag-alag class mein alag kaam kar sakta hai (Method Overriding).</li>
+            </ul>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+                    classDiagram
+                    class BaseAgent {
+                        +string name
+                        +string llm_model
+                        +run_prompt()
+                    }
+                    class ResearchAgent {
+                        +search_web()
+                        +run_prompt()
+                    }
+                    class CodingAgent {
+                        +execute_code()
+                        +run_prompt()
+                    }
+                    
+                    BaseAgent <|-- ResearchAgent : Inherits
+                    BaseAgent <|-- CodingAgent : Inherits
+                </div>
+                <div class="diagram-caption">Figure 5.1: Inheritance & Polymorphism in AI Agents</div>
+            </div>
+
+            <h3>4. Constructors & Magic Methods</h3>
+            <p><strong>Constructor:</strong> (Python mein <code>__init__</code>). Ye tab automatically call hota hai jab object create hota hai. Initialization ke kaam aata hai.<br>
+            <strong>Magic Methods (Dunder Methods):</strong> Double underscore se start hone wale special methods (e.g., <code>__str__</code>, <code>__len__</code>, <code>__add__</code>) jo object ka behavior native Python syntax ke sath link karte hain.</p>
+
+            <h3>5. Code Example: Building an Agent Class</h3>
+<pre><code><span class="k">class</span> <span class="f">AIAgent</span>:
+    <span class="c"># Constructor (Initialization)</span>
+    <span class="k">def</span> <span class="f">__init__</span>(self, name, memory_size):
+        self.name = name                 <span class="c"># Public attribute</span>
+        self._memory = []                <span class="c"># Protected attribute</span>
+        self.__api_key = <span class="s">"secret_key"</span>    <span class="c"># Private attribute (Encapsulation)</span>
+
+    <span class="c"># Instance Method</span>
+    <span class="k">def</span> <span class="f">add_to_memory</span>(self, text):
+        self._memory.append(text)
+        <span class="k">print</span>(<span class="s">f"[{self.name}] Saved to memory."</span>)
+
+    <span class="c"># Magic Method for string representation</span>
+    <span class="k">def</span> <span class="f">__str__</span>(self):
+        <span class="k">return</span> <span class="s">f"&lt;Agent: {self.name}&gt;"</span>
+
+<span class="c"># Inheritance</span>
+<span class="k">class</span> <span class="f">DevAgent</span>(AIAgent):
+    <span class="k">def</span> <span class="f">write_code</span>(self, language):
+        <span class="k">print</span>(<span class="s">f"{self.name} is writing {language} code..."</span>)
+
+<span class="c"># Usage</span>
+coder = DevAgent(<span class="s">"CodeBot"</span>, <span class="s">1024</span>)
+coder.add_to_memory(<span class="s">"User wants a python script."</span>)
+coder.write_code(<span class="s">"Python"</span>)
+</code></pre>
+
+            <div class="callout warning">
+                <div class="callout-title">Static vs Instance Methods</div>
+                Beginners confuse <code>@staticmethod</code> with instance methods. Agar method class ke variables (self) ko use nahi kar raha, toh use static method banana chahiye. Yeh purely helper function ki tarah kaam karta hai class ke andar.
+            </div>
+
+        </div>
+
+        <!-- CHAPTER 6 -->
+        <div class="page" id="ch6">
+            <h1>6. Error Handling & Debugging</h1>
+
+            <h3>1. Why do we need it?</h3>
+            <p>Production mein code kabhi perfect nahi hota. API down ho sakti hai, user galat data daal sakta hai. Agar code gracefully errors ko handle nahi karega, toh application crash ho jayegi. Isse bachne ke liye exception handling use hoti hai.</p>
+
+            <h3>2. try, except, finally blocks</h3>
+            <ul>
+                <li><strong>try:</strong> Is block ke andar hum risky code rakhte hain (jo crash kar sakta hai).</li>
+                <li><strong>except:</strong> Agar try block fail hua, toh program crash hone ki bajaye is block me aa jata hai. Hum specific errors pakad sakte hain (e.g., <code>ZeroDivisionError</code>).</li>
+                <li><strong>finally:</strong> Yeh block hamesha chalega, chahe error aaye ya na aaye. Iska main use resources free karna ya file close karna hota hai.</li>
+            </ul>
+
+            <h3>3. Custom Exceptions & Logging</h3>
+            <p>Kabhi-kabhi built-in errors kaafi nahi hote. Aap apni exceptions bana sakte hain `Exception` class ko inherit karke. Sath hi, errors ko console pe `print()` karne ki jagah `logging` module ka use karna best practice hai.</p>
+
+            <h3>4. Code Example</h3>
+<pre><code><span class="k">import</span> logging
+
+<span class="c"># Setup basic logging</span>
+logging.basicConfig(level=logging.ERROR, format=<span class="s">"%(asctime)s - %(message)s"</span>)
+
+<span class="c"># Custom Exception</span>
+<span class="k">class</span> <span class="f">TokenLimitError</span>(<span class="k">Exception</span>):
+    <span class="k">pass</span>
+
+<span class="k">def</span> <span class="f">generate_text</span>(prompt_length):
+    <span class="k">try</span>:
+        <span class="k">if</span> prompt_length > <span class="s">4000</span>:
+            <span class="c"># Raising our custom error manually</span>
+            <span class="k">raise</span> TokenLimitError(<span class="s">"Prompt too long!"</span>)
+        <span class="k">return</span> <span class="s">"Success: Generation complete."</span>
+        
+    <span class="k">except</span> TokenLimitError <span class="k">as</span> e:
+        <span class="c"># Handled specific custom error</span>
+        logging.error(<span class="s">f"Model constraint hit: {e}"</span>)
+        
+    <span class="k">except</span> <span class="k">Exception</span> <span class="k">as</span> e:
+        <span class="c"># Handled any other unexpected error</span>
+        logging.error(<span class="s">f"Unknown error: {e}"</span>)
+        
+    <span class="k">finally</span>:
+        <span class="k">print</span>(<span class="s">"Execution of generation pipeline finished."</span>)
+</code></pre>
+        </div>
+
+        <!-- CHAPTER 7 -->
+        <div class="page" id="ch7">
+            <h1>7. File Handling</h1>
+
+            <h3>1. What is File Handling?</h3>
+            <p>RAM volatile hoti hai (program band hote hi data khatam). Data ko permanently store karne ke liye hum use Files (Hard Disk) me save karte hain. RAG (Retrieval-Augmented Generation) systems mein PDFs, CSVs, aur text files read karna foundation step hai.</p>
+
+            <h3>2. Reading and Writing Files</h3>
+            <p>Python mein <code>open()</code> function use hota hai. Context managers (<code>with</code> statement) ka use sabse safe hota hai kyunki file automatic close ho jati hai.</p>
+
+            <h3>3. File Formats</h3>
+            <ul>
+                <li><strong>TXT:</strong> Plain text.</li>
+                <li><strong>CSV (Comma Separated Values):</strong> Tabular data. Pandas library best hai iske liye.</li>
+                <li><strong>JSON (JavaScript Object Notation):</strong> Hierarchy/Nested data. Web APIs aur AI agents ka primary communication format.</li>
+                <li><strong>Binary (PDF, Images):</strong> Encodings in byte format (rb/wb modes).</li>
+            </ul>
+
+            <h3>4. File Streaming (Handling Large Files)</h3>
+            <p>Agar file 10GB ki hai toh `read()` memory ko full kar dega. Isliye hum file object pe iterators lagate hain, jo line-by-line read karta hai chunking ke through.</p>
+
+            <div class="callout tip">
+                <div class="callout-title">RAG Concept Intro</div>
+                AI vector databases mein dalne se pehle, PDF files ko read karke chhote text "chunks" (jaise 500 words per chunk) mein divide kiya jata hai. File handling yahan critical role play karti hai.
+            </div>
+
+        </div>
+
+        <!-- CHAPTER 8 -->
+        <div class="page" id="ch8">
+            <h1>8. Data Structures & Algorithms (DSA)</h1>
+
+            <h3>1. Why DSA matters in AI?</h3>
+            <p>AI bas machine learning model nahi hai. Data preparation, search speed, aur system optimization directly DSA par dependent hain. Fast retrieval algorithms (like Vector Search) Graphs aur Trees par base hote hain.</p>
+
+            <h3>2. Big O Notation (Time/Space Complexity)</h3>
+            <p>Algorithm kitna "time" lega aur kitni "memory" (space) lega as data grows. Ise mathematical notation mein express karte hain: $\mathcal{O}(1)$, $\mathcal{O}(\log N)$, $\mathcal{O}(N)$, $\mathcal{O}(N^2)$.</p>
+
+            <h3>3. Core Data Structures</h3>
+            <table>
+                <tr>
+                    <th>Structure</th>
+                    <th>Concept</th>
+                    <th>Time Complexity (Search)</th>
+                    <th>AI/Agent Use Case</th>
+                </tr>
+                <tr>
+                    <td><strong>Arrays/Lists</strong></td>
+                    <td>Contiguous memory allocation.</td>
+                    <td>$\mathcal{O}(N)$</td>
+                    <td>Storing sequence of conversation turns.</td>
+                </tr>
+                <tr>
+                    <td><strong>Hashmaps (Dict)</strong></td>
+                    <td>Key-Value pairs via Hash function.</td>
+                    <td>$\mathcal{O}(1)$</td>
+                    <td>Caching API responses, prompt lookup.</td>
+                </tr>
+                <tr>
+                    <td><strong>Stacks/Queues</strong></td>
+                    <td>LIFO (Stack) / FIFO (Queue).</td>
+                    <td>$\mathcal{O}(N)$</td>
+                    <td>Managing async task queues for agents.</td>
+                </tr>
+                <tr>
+                    <td><strong>Trees & Graphs</strong></td>
+                    <td>Hierarchical / Network data.</td>
+                    <td>$\mathcal{O}(\log N)$ to $\mathcal{O}(N)$</td>
+                    <td>Decision trees, Knowledge Graphs (Graph RAG), HNSW Vector Index.</td>
+                </tr>
+            </table>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+                    graph TD
+                    A((Root Node: Decision))
+                    A -->|Condition A| B((Child Node))
+                    A -->|Condition B| C((Child Node))
+                    B --> D((Leaf: Action 1))
+                    B --> E((Leaf: Action 2))
+                </div>
+                <div class="diagram-caption">Figure 8.1: Basic Tree Structure (Used in Decision Making & Search)</div>
+            </div>
+
+            <h3>4. Searching and Sorting</h3>
+            <p><strong>Binary Search:</strong> Sorted list mein data dhoondhne ka sabse fast tarika $\mathcal{O}(\log N)$. Yeh har step mein data ko half kar deta hai.<br>
+            <strong>Sorting:</strong> Data order mein lagana (QuickSort, MergeSort). Algorithms internally $\mathcal{O}(N \log N)$ complexity par kaam karte hain.</p>
+
+        </div>
+
+        <!-- CHAPTER 9 -->
+        <div class="page" id="ch9">
+            <h1>9. APIs & Networking</h1>
+
+            <h3>1. What is an API?</h3>
+            <p>API (Application Programming Interface) do software systems ke beech communication ka zariya hai. Jab aapka code OpenAI se connect karta hai, toh wo ek API Call hota hai.</p>
+
+            <h3>2. HTTP Protocol & REST</h3>
+            <p>Web ka base HTTP (HyperText Transfer Protocol) hai. Isme ek <strong>Request</strong> jati hai aur <strong>Response</strong> aata hai.<br>
+            <strong>REST APIs</strong> 4 main HTTP methods use karte hain:</p>
+            <ul>
+                <li><strong>GET:</strong> Data lane (Read) ke liye.</li>
+                <li><strong>POST:</strong> Naya data create karne ke liye (e.g., Sending prompt to LLM).</li>
+                <li><strong>PUT/PATCH:</strong> Existing data update karne ke liye.</li>
+                <li><strong>DELETE:</strong> Data remove karne ke liye.</li>
+            </ul>
+
+            <div class="diagram-container">
+                <div class="mermaid">
+                    sequenceDiagram
+                    participant Client (Agent)
+                    participant Server (OpenAI)
+                    
+                    Client->>Server: POST /v1/chat/completions (JSON Payload + API Key)
+                    Server-->>Server: Authentication & Processing
+                    Server->>Client: 200 OK (JSON Response with generated text)
+                </div>
+                <div class="diagram-caption">Figure 9.1: Request/Response Cycle</div>
+            </div>
+
+            <h3>3. Headers, Authentication & WebSockets</h3>
+            <p><strong>Headers:</strong> Request ke sath extra information bhejte hain, jaise <code>Content-Type: application/json</code>.<br>
+            <strong>Authentication:</strong> API Keys, OAuth tokens, ya JWT (JSON Web Tokens) se server pehchanta hai ki request aayi kahan se hai.<br>
+            <strong>WebSockets:</strong> HTTP one-time request/response hai. WebSockets persistent two-way connection (live stream) banate hain. Voice AI agents mostly WebSockets use karte hain realtime bidirectional audio ke liye.</p>
+        </div>
+
+        <!-- CHAPTER 10 -->
+        <div class="page" id="ch10">
+            <h1>10. Databases</h1>
+
+            <h3>1. What is a Database?</h3>
+            <p>Structured way mein large scale data store, manage aur retrieve karne ka system. AI applications mein User profiles, agent memories aur chat history DB mein store hoti hai.</p>
+
+            <h3>2. SQL vs NoSQL</h3>
+            <p><strong>SQL (Relational):</strong> PostgreSQL, MySQL. Data strict Tables (Rows & Columns) mein store hota hai. Relationships aur ACID transactions ke liye best hain.<br>
+            <strong>NoSQL (Non-Relational):</strong> MongoDB, DynamoDB. Data JSON-like Documents mein store hota hai. Flexible schema, fast horizontal scaling. Chat logs ke liye best hai kyunki messages ka format change ho sakta hai.</p>
+            
+            <h3>3. CRUD Operations</h3>
+            <p>Har database pe char (4) mukhya operations hote hain: <strong>C</strong>reate (Insert), <strong>R</strong>ead (Select), <strong>U</strong>pdate, <strong>D</strong>elete.</p>
+
+            <h3>4. Indexing & ORM</h3>
+            <p><strong>Indexing:</strong> Jaise kitaab ke end mein index page hota hai word search karne ke liye, DB mein columns par index lagane se Search speed drastically badh jati hai.<br>
+            <strong>ORM (Object-Relational Mapper):</strong> SQL queries likhne ki jagah Python Classes ka use karke DB manipulate karna (e.g., SQLAlchemy). Isse code clean rehta hai.</p>
+        </div>
+
+        <!-- CHAPTER 11 -->
+        <div class="page" id="ch11">
+            <h1>11. Async Programming</h1>
+
+            <h3>1. Why do we need Async?</h3>
+            <p>Traditional code "Synchronous" hota hai—ek line chalti hai, jab tak wo khatam na ho, agli line nahi chalti. Agar aapka code external API (LLM) ka wait kar raha hai, toh CPU idle (khali) baitha rehta hai. Ise resolve karne ke liye Concurrency use hoti hai.</p>
+
+            <h3>2. Threads vs Processes vs Async/Await</h3>
+            <ul>
+                <li><strong>Multiprocessing:</strong> Multiple CPU cores use karna. Heavy Maths/Machine Learning tasks ke liye (CPU-Bound).</li>
+                <li><strong>Multithreading:</strong> Ek process mein multiple threads (halki processing paths). File/Network I/O ke liye. But Python mein GIL (Global Interpreter Lock) ki wajah se true parallel nahi hota.</li>
+                <li><strong>Async/Await (Event Loop):</strong> Single-threaded cooperative multitasking. Jab ek task (jaise Network request) wait state me jata hai, Event Loop control dusre task ko de deta hai. <em>FastAPI aur modern web/agent systems isi pe base hain!</em></li>
+            </ul>
+
+            <h3>3. Code Example: Python Async/Await</h3>
+<pre><code><span class="k">import</span> asyncio
+<span class="k">import</span> time
+
+<span class="k">async def</span> <span class="f">fetch_data</span>(id, delay):
+    <span class="k">print</span>(<span class="s">f"Task {id}: Request sent..."</span>)
+    <span class="k">await</span> asyncio.sleep(delay) <span class="c"># Simulating I/O wait (Not blocking CPU)</span>
+    <span class="k">print</span>(<span class="s">f"Task {id}: Response received!"</span>)
+    <span class="k">return</span> <span class="s">f"Data {id}"</span>
+
+<span class="k">async def</span> <span class="f">main</span>():
+    <span class="c"># Running 3 tasks concurrently</span>
+    <span class="c"># Even though delays sum up to 6 seconds, this will finish in 3 seconds.</span>
+    results = <span class="k">await</span> asyncio.gather(
+        fetch_data(<span class="s">1</span>, <span class="s">2</span>),
+        fetch_data(<span class="s">2</span>, <span class="s">3</span>),
+        fetch_data(<span class="s">3</span>, <span class="s">1</span>)
+    )
+    <span class="k">print</span>(<span class="s">"All Done:"</span>, results)
+
+<span class="c"># Run event loop</span>
+<span class="c"># asyncio.run(main())</span>
+</code></pre>
+        </div>
+
+        <!-- CHAPTER 12 -->
+        <div class="page" id="ch12">
+            <h1>12. Development Tools</h1>
+
+            <h3>1. Git & GitHub (Version Control)</h3>
+            <p><strong>Git:</strong> Aapke code ke changes ko track karne ka software. Agar code tut jaye, toh purane version par revert kar sakte ho. (Time machine for code).<br>
+            <strong>GitHub:</strong> Cloud platform jahan Git repositories host hoti hain. Collaborative coding ke liye standard hai. (<code>git commit</code>, <code>git push</code>, <code>git pull</code>).</p>
+
+            <h3>2. Environment Management (Virtual Envs, pip)</h3>
+            <p>Har project ko alag versions ke packages chahiye hote hain. <strong>Virtual Environment</strong> (<code>venv</code>, <code>conda</code>) ek isolated folder banata hai jahan hum <code>pip</code> se sirf us project ke dependencies install karte hain. Isse system-level conflicts nahi hote.</p>
+
+            <h3>3. Docker Basics</h3>
+            <p>"It works on my machine" problem solve karne ke liye Docker use hota hai. Yeh aapke app aur uski dependencies ko ek 'Container' mein pack kar deta hai jo kisi bhi OS par ek jaisa run karta hai. Agent deployment ke liye essential hai.</p>
+
+            <h3>4. IDEs and Terminal</h3>
+            <p><strong>VS Code:</strong> Industry standard editor. Extensions aur integrated terminal isko powerful banate hain.<br>
+            <strong>Jupyter Notebook:</strong> Data Science aur ML ke experimentation ke liye best hai kyunki isme code cells aur outputs ek sath dikhte hain.</p>
+            
+            <hr style="margin: 40px 0; border: 0; border-top: 1px solid var(--border-color);">
+            
+            <div align="center">
+                <p><strong>End of Part 1 — Programming Foundations.</strong></p>
+                <p><em>Is base ke bina AI agents ka architecture samajhna mushkil hai. Ab aap code ke building blocks mein maharat haasil kar chuke hain.</em></p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- PDF Download Button -->
+    <button class="pdf-btn" onclick="window.print()">Download PDF</button>
+
+</body>
+</html>
